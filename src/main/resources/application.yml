@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: architecture
+
+  devtools:
+    livereload:
+      enabled: true
+    restart:
+      enabled: true
+
+  jpa:
+    hibernate:
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+      ddl-auto: update
+    show-sql: true
+
+
+  datasource:
+    url: jdbc:mariadb://localhost:3306/HHPLUS
+    username: hhplus
+    password: hhplus_dba
+    driver-class-name: org.mariadb.jdbc.Driver  # MariaDB JDBC 드라이버 지정
