@@ -12,8 +12,11 @@ spring:
     hibernate:
       naming:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
-      ddl-auto: update
-    show-sql: true
+      ddl-auto: create
+    properties:
+      hibernate:
+        #show-sql: true
+        format_sql: true
 
 
   datasource:
@@ -21,3 +24,7 @@ spring:
     username: hhplus
     password: hhplus_dba
     driver-class-name: org.mariadb.jdbc.Driver  # MariaDB JDBC 드라이버 지정
+
+logging:
+  level:
+    org.hibernate.SQL: debug
