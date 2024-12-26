@@ -1,0 +1,29 @@
+spring:
+  application:
+    name: architecture-test
+
+  jpa:
+    show-sql: false # Hibernate 자체 SQL 로깅 사용
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MariaDBDialect # MariaDB Dialect 설정
+        format_sql: true # SQL 포맷
+        highlight_sql: true # 하이라이트된 SQL 출력
+        type:
+          descriptor:
+            sql:
+              BasicBinder:
+                log_bindings: true # 바인딩 변수 로그 활성화
+    hibernate:
+      ddl-auto: create-drop # 테스트 시 데이터베이스 스키마 초기화
+
+  datasource:
+    url: jdbc:log4jdbc:mariadb://localhost:3306/HHPLUS # log4jdbc 사용
+    username: hhplus
+    password: hhplus_dba
+    driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy # MariaDB JDBC 드라이버 사용
+
+logging:
+  level:
+    org.hibernate.SQL: DEBUG # Hibernate SQL 로깅
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE # 바인딩 값 로깅
