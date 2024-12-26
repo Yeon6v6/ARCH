@@ -3,7 +3,6 @@ package hhplus.project.architecture.lecture.interfaces.dto;
 import hhplus.project.architecture.lecture.domain.entity.Lecture;
 import lombok.*;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
@@ -15,7 +14,7 @@ public class LectureListResponse {
     private String coach;
     private LocalDateTime lectureDate;
     private int capacity;
-    private int appliedCount;
+    private int AppliedCnt;
 
     // Entity에서 DTO로 변환
     public static LectureListResponse fromEntity(Lecture lecture) {
@@ -25,7 +24,7 @@ public class LectureListResponse {
                 lecture.getCoach(),
                 lecture.getLectureDate(),
                 lecture.getCapacity(),
-                lecture.getAppliedCount()
+                lecture.getAppliedCnt()
         );
     }
 }

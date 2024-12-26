@@ -1,6 +1,7 @@
 package hhplus.project.architecture.lecture.application.service;
 
 import hhplus.project.architecture.lecture.application.dto.ApplyLectureServiceRequest;
+import hhplus.project.architecture.lecture.application.dto.LectureAppliedHistResponse;
 import hhplus.project.architecture.lecture.domain.entity.ApplyHistory;
 import hhplus.project.architecture.lecture.domain.entity.Lecture;
 import hhplus.project.architecture.lecture.domain.repository.ApplyHistoryRepository;
@@ -11,7 +12,10 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -24,9 +28,9 @@ public class ApplyLectureService {
     public void applyForLecture(ApplyLectureServiceRequest request) {
         Lecture lecture = lectureRepository.findById(request.getLectureId())
                 .orElseThrow(() -> new EntityNotFoundException("강의를 찾을 수 없습니다."));
-        
+
         //이미 신청했는지 체크
-        if(applyHistoryRepository.isAppliedLectureByUserId(request.getUserId(), request.getLectureId())){
+        if (applyHistoryRepository.isAppliedLectureByUserId(request.getUserId(), request.getLectureId())) {
             throw new IllegalArgumentException("이미 신청한 강의입니다.");
         }
 
@@ -38,8 +42,9 @@ public class ApplyLectureService {
         //신청처리
         ApplyHistory applyHistory = ApplyHistory.builder()
                 .userId(request.getUserId())
-                .lecture(lecture)
-                .regdate(LocalDateTime.now())
+                .lectureId(request.getLectureId())
+                .status("SUCCESS")
+                .regDate(LocalDateTime.now())
                 .build();
 
         applyHistoryRepository.save(applyHistory);
@@ -49,11 +54,31 @@ public class ApplyLectureService {
 
     // 강의 목록 조회 API
     public List<Lecture> getAvailableLectures(LocalDate date) {
-        return lectureRepository.findAvailableLecturesByDate(date);
+        if (date == null) {
+            date = LocalDate.now();
+        }
+        //LocalDate를 LocalDateTime 범위로 변환
+        LocalDateTime startDateTime = date.atStartOfDay();
+        LocalDateTime endDateTime = date.atTime(LocalTime.MAX);
+
+        return lectureRepository.findAvailableLecturesByDate(startDateTime, endDateTime);
     }
 
     // 신청 완료 목록 조회 API
-    public List<ApplyHistory> getAppliedLectures(Long userId) {
-        return applyHistoryRepository.findApplyHistoryByUserId(userId);
+    public List<LectureAppliedHistResponse> getAppliedLectures(Long userId) {
+        List<ApplyHistory> successHist = applyHistoryRepository.findApplyHistoryByUserId(userId);
+
+        //lectureId 목록이 비어 있으면 빈 리스트 반환
+        if (successHist.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        return successHist.stream()
+                .map(history -> {
+                    Lecture lecture = lectureRepository.findById(history.getLectureId())
+                            .orElseThrow(() -> new IllegalArgumentException("해당 강의를 찾을 수 없습니다. lectureId: " + history.getLectureId()));
+                    return LectureAppliedHistResponse.fromEntities(history, lecture);
+                })
+                .collect(Collectors.toList());
     }
 }

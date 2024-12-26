@@ -1,8 +1,8 @@
 package hhplus.project.architecture.lecture.interfaces.controller;
 
 import hhplus.project.architecture.lecture.application.dto.ApplyLectureServiceRequest;
+import hhplus.project.architecture.lecture.application.dto.LectureAppliedHistResponse;
 import hhplus.project.architecture.lecture.application.service.ApplyLectureService;
-import hhplus.project.architecture.lecture.domain.entity.ApplyHistory;
 import hhplus.project.architecture.lecture.domain.entity.Lecture;
 import hhplus.project.architecture.lecture.interfaces.dto.ApplyHistoryResponse;
 import hhplus.project.architecture.lecture.interfaces.dto.ApplyLectureRequest;
@@ -38,7 +38,7 @@ public class ApplyLectureController {
 
     // 강의 목록 조회 API
     @GetMapping("/available")
-        public ResponseEntity<List<LectureListResponse>> getAvailableLectures(@RequestParam(defaultValue = "#{T(java.time.LocalDate).now()") LocalDate date) {
+        public ResponseEntity<List<LectureListResponse>> getAvailableLectures(@RequestParam(name = "date", required = false, defaultValue = "#{T(java.time.LocalDate).now()") LocalDate date) {
             List<Lecture> lectures = applyLectureService.getAvailableLectures(date);
             List<LectureListResponse> response = lectures.stream()
                     .map(LectureListResponse::fromEntity)
@@ -51,12 +51,15 @@ public class ApplyLectureController {
 
     // 신청 완료 목록 조회 API
     @GetMapping("/{userId}/applied")
-    public ResponseEntity<List<ApplyHistoryResponse>> getAppliedLectures(@PathVariable @NotNull Long userId) {
-        List<ApplyHistory> histories = applyLectureService.getAppliedLectures(userId);
-        List<ApplyHistoryResponse> response = histories.stream()
-                .map(ApplyHistoryResponse::fromEntity)
+    public ResponseEntity<List<ApplyHistoryResponse>> getAppliedLectures(@PathVariable("userId") @NotNull Long userId) {
+        List<LectureAppliedHistResponse> serviceResponse = applyLectureService.getAppliedLectures(userId);
+
+        // Service Layer의 결과를 DTO로 변환
+        List<ApplyHistoryResponse> response = serviceResponse.stream()
+                .map(ApplyHistoryResponse::from)
                 .collect(Collectors.toList());
-        if (ObjectUtils.isEmpty(response)) {
+
+        if (response.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }
         return ResponseEntity.ok(response);

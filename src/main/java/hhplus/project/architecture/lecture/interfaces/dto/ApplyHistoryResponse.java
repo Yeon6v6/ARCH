@@ -1,10 +1,8 @@
 package hhplus.project.architecture.lecture.interfaces.dto;
 
-import hhplus.project.architecture.lecture.domain.entity.ApplyHistory;
-import hhplus.project.architecture.lecture.domain.entity.Lecture;
+import hhplus.project.architecture.lecture.application.dto.LectureAppliedHistResponse;
 import lombok.*;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
@@ -17,14 +15,13 @@ public class ApplyHistoryResponse {
     private LocalDateTime lectureDate;
     private LocalDateTime regDate;
 
-    public static ApplyHistoryResponse fromEntity(ApplyHistory applyHistory) {
-        Lecture lecture = applyHistory.getLecture(); // Lecture 객체 가져오기
+    public static ApplyHistoryResponse from(LectureAppliedHistResponse lectureAppliedHistResponse) {
         return new ApplyHistoryResponse(
-                lecture.getLectureId(),
-                lecture.getLectureName(),
-                lecture.getCoach(),
-                lecture.getLectureDate(),
-                applyHistory.getRegdate()
+                lectureAppliedHistResponse.getLectureId(),
+                lectureAppliedHistResponse.getLectureName(),
+                lectureAppliedHistResponse.getCoach(),
+                lectureAppliedHistResponse.getLectureDate(),
+                lectureAppliedHistResponse.getRegDate()
         );
     }
 }
