@@ -25,7 +25,7 @@ public class ApplyLectureControllerTest {
     @Test
     void 강의_신청_API_E2E_테스트() {
         // Given: 강의 신청 요청 생성
-        ApplyLectureRequest request = new ApplyLectureRequest(101L, 1L);
+        ApplyLectureRequest request = new ApplyLectureRequest(199L, 1L);
         HttpEntity<ApplyLectureRequest> entity = new HttpEntity<>(request);
 
         // When: API 호출

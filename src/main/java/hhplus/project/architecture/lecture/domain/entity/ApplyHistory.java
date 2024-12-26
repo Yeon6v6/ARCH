@@ -6,19 +6,17 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name="ApplyHistory",
-        uniqueConstraints = { @UniqueConstraint(columnNames = {"lecutre_id", "user_id" }) }
-        )
-@Getter @Setter
+@Table(name="t_apply_history")
+@Getter
 @NoArgsConstructor @AllArgsConstructor
 @Builder
 public class ApplyHistory {
 
-    @Id @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="apply_id")
     private Long applyId;
 
-    @Column(name="lecture_id", nullable = false, length = 50)
+    @Column(name="lecture_id", nullable = false)
     private Long lectureId;
 
     @Column(name="user_id", nullable = false)

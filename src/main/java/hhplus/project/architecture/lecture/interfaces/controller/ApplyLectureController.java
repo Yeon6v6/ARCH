@@ -31,7 +31,7 @@ public class ApplyLectureController {
     @PostMapping("/{lectureId}/apply")
     public ResponseEntity<ApplyLectureResponse> applyForLecture(@PathVariable("lectureId") @NotNull Long lectureId, @RequestBody ApplyLectureRequest request) {
         ApplyLectureServiceRequest serviceRequest = new ApplyLectureServiceRequest(request.getUserId(), lectureId);
-        applyLectureService.applyForLecture(serviceRequest);
+        applyLectureService.applyLecture(serviceRequest);
         return ResponseEntity.ok(ApplyLectureResponse.success("강의 신청이 완료되었습니다."));
     }
 

@@ -6,15 +6,14 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "Lecture")
+@Table(name = "t_lecture")
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor
 @Builder
 public class Lecture{
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="lecture_id")
-    //@GeneratedValue(generator = "UUID") @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
+    @Column(name="lecture_id", length = 50)
     private Long lectureId;
 
     @Column(name="lecture_name", nullable = false, length = 100)
@@ -23,13 +22,13 @@ public class Lecture{
     @Column(nullable = false, length = 100)
     private String coach;
 
-    @Column(name="lecture_date", nullable = false)
+    @Column(name="lecture_date")
     private LocalDateTime lectureDate;  //강의시간
 
-    @Column(name="applied_cnt", nullable = false)
-    private int appliedCnt; //현재 신청한 인원 수
+    @Column(name="applied_cnt")
+    private int appliedCnt = 0; //현재 신청한 인원 수
     
-    @Column(nullable = false)
+    @Column
     private int capacity = 30; //강의 최대 수용 인원
 
     //강의 남은 자리 확인

@@ -7,6 +7,7 @@ import hhplus.project.architecture.lecture.domain.entity.Lecture;
 import hhplus.project.architecture.lecture.domain.repository.ApplyHistoryRepository;
 import hhplus.project.architecture.lecture.domain.repository.LectureRepository;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -25,31 +26,34 @@ public class ApplyLectureService {
     private final ApplyHistoryRepository applyHistoryRepository;
 
     // 강의 신청 API
-    public void applyForLecture(ApplyLectureServiceRequest request) {
-        Lecture lecture = lectureRepository.findById(request.getLectureId())
+    @Transactional
+    public void applyLecture(ApplyLectureServiceRequest request) {
+        // 강의 Entity를 비관적 락 잠금으로 갖고오기
+        Lecture lecture = lectureRepository.findByLectureWithLock(request.getLectureId())
                 .orElseThrow(() -> new EntityNotFoundException("강의를 찾을 수 없습니다."));
 
-        //이미 신청했는지 체크
+        // 이미 신청했는지 체크
         if (applyHistoryRepository.isAppliedLectureByUserId(request.getUserId(), request.getLectureId())) {
             throw new IllegalArgumentException("이미 신청한 강의입니다.");
         }
 
-        //강의 정원 초과 여부 확인
+        // 강의 정원 초과 여부 확인
         if (!lecture.isAvailable()) {
             throw new IllegalStateException("강의 정원이 초과되었습니다.");
         }
+        
+        // 신청처리
+        lecture.apply();
+        lectureRepository.save(lecture); //증가한 인원으로 저장
 
-        //신청처리
+        // 신청 기록 저장
         ApplyHistory applyHistory = ApplyHistory.builder()
                 .userId(request.getUserId())
                 .lectureId(request.getLectureId())
                 .status("SUCCESS")
                 .regDate(LocalDateTime.now())
                 .build();
-
         applyHistoryRepository.save(applyHistory);
-        lecture.apply();
-        lectureRepository.save(lecture);
     }
 
     // 강의 목록 조회 API
@@ -57,7 +61,7 @@ public class ApplyLectureService {
         if (date == null) {
             date = LocalDate.now();
         }
-        //LocalDate를 LocalDateTime 범위로 변환
+        // LocalDate를 LocalDateTime 범위로 변환
         LocalDateTime startDateTime = date.atStartOfDay();
         LocalDateTime endDateTime = date.atTime(LocalTime.MAX);
 
@@ -68,7 +72,7 @@ public class ApplyLectureService {
     public List<LectureAppliedHistResponse> getAppliedLectures(Long userId) {
         List<ApplyHistory> successHist = applyHistoryRepository.findApplyHistoryByUserId(userId);
 
-        //lectureId 목록이 비어 있으면 빈 리스트 반환
+        // lectureId 목록이 비어 있으면 빈 리스트 반환
         if (successHist.isEmpty()) {
             return Collections.emptyList();
         }
