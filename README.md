@@ -1,2 +1,2 @@
-# HH99_ARCH
-hhplus TDD+Clean Architecture Poject
+# ARCH
+TDD+Clean Architecture Poject
